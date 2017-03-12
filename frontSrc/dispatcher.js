@@ -20,6 +20,14 @@ function initialize() {
 
     const socket = io('http://localhost:3000');
 
+    socket.on('off', msg => {
+        if (buses[msg.id]) {
+            buses[msg.id].el.remove();
+            buses[msg.id].elMustBeHere.remove();
+            delete buses[msg.id];
+        }
+    });
+
     socket.on('connect', () => {
         console.log('connect')
     });
