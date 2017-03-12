@@ -8453,9 +8453,7 @@ var Route = require('./Route.js'),
     routeConfig = require('./94.json'),
     clock = false,
     route = new Route(routeConfig),
-    index = 0,
-    buses = {},
-    me = {};
+    index = 0;
 
 function makeClock(time) {
     var sign = '';
@@ -8507,78 +8505,75 @@ function checkOffset(el) {
 }
 
 document.addEventListener("DOMContentLoaded"/*'deviceready'*/, function () {
-    var //mustBeHere = document.querySelector('.must-be-here'),
-        position = 0,
-        me = {
-            //el: document.querySelector('.bus'),
-            position: null,
-            fromStart: 0
-        };
 
-    const socket = io('http://192.168.0.106:3000');
-    socket.on('message', msg => {
-        msg.buses.forEach(bus => {
-            if (bus.id == busId.value) return;
-
-            if (!buses[bus.id]) {
-                var el = $('<div class="another-bus"><span>' + bus.id + '</span></div>'),
-                    elMustBeHere = $('<div class="another-bus must-be-here"><span>' + bus.id + '</span></div>');
-
-                buses[bus.id] = {
-                    el,
-                    elMustBeHere
-                };
-
-                $(routeView).append(el);
-                $(routeView).append(elMustBeHere);
-            }
-
-            buses[bus.id].el
-                .css('left', bus.here+'%');
-
-            buses[bus.id].elMustBeHere
-                .css('left', bus.mustBeHere+'%');
-
-            if (bus.here > bus.mustBeHere) {
-                buses[bus.id].el.removeClass('lag').addClass('lead');
-                buses[bus.id].elMustBeHere.removeClass('lead').addClass('lag');
-            } else if (bus.here < bus.mustBeHere) {
-                buses[bus.id].el.removeClass('lead').addClass('lag');
-                buses[bus.id].elMustBeHere.removeClass('lag').addClass('lead');
-            } else {
-                buses[bus.id].el.removeClass('lag lead');
-                buses[bus.id].elMustBeHere.removeClass('lag lead');
-            }
-        });
-    });
-
-    socket.on('connect', function(){console.log('connect')});
-    socket.on('disconnect', function(){console.log('disconnect')});
-
-/*    watch.onclick = function () {
-        console.log('watching');
-        socket.on('message', function(msg){
-            mustBeHere.setAttribute('style', 'width:' + msg + '%');
-        });
-    };*/
-
-
-    /*document.onclick = function () {
-        checkOffset(me.el);
-    };*/
-
-    route.stops.forEach(function (stop) {
-        var position = stop.getPosition(),
-            marker = document.createElement('div');
-
-        marker.classList.add('bus-stop');
-        marker.innerHTML = '<span class="capt">' + stop.id + '</span>';
-        marker.setAttribute('style', 'left:' + position + '%');
-        routeView.appendChild(marker);
-    });
-
+    var position = 0,
+        me = {},
+        buses = {},
+        latitude = null,
+        longitude = null;
 
     startBtn.onclick = function () {
+
+        const socket = io('http://' + serverIp.value + ':3000');//192.168.0.106
+
+        socket.on('off', msg => {
+            if (buses[msg.id]) {
+                buses[msg.id].el.remove();
+                buses[msg.id].elMustBeHere.remove();
+                delete buses[msg.id];
+            }
+        });
+
+        socket.on('message', msg => {
+            msg.buses.forEach(bus => {
+                if (bus.id == busId.value) return;
+
+                if (!buses[bus.id]) {
+                    var el = $('<div class="another-bus"><span>' + bus.id + '</span></div>'),
+                        elMustBeHere = $('<div class="another-bus must-be-here"><span>' + bus.id + '</span></div>');
+
+                    buses[bus.id] = {
+                        el,
+                        elMustBeHere
+                    };
+
+                    $(routeView).append(el);
+                    $(routeView).append(elMustBeHere);
+                }
+
+                buses[bus.id].el
+                    .css('left', bus.here + '%');
+
+                buses[bus.id].elMustBeHere
+                    .css('left', bus.mustBeHere + '%');
+
+                if (bus.here > bus.mustBeHere) {
+                    buses[bus.id].el.removeClass('lag').addClass('lead');
+                    buses[bus.id].elMustBeHere.removeClass('lead').addClass('lag');
+                } else if (bus.here < bus.mustBeHere) {
+                    buses[bus.id].el.removeClass('lead').addClass('lag');
+                    buses[bus.id].elMustBeHere.removeClass('lag').addClass('lead');
+                } else {
+                    buses[bus.id].el.removeClass('lag lead');
+                    buses[bus.id].elMustBeHere.removeClass('lag lead');
+                }
+            });
+        });
+
+        socket.on('connect', () => console.log('connect'));
+
+        socket.on('disconnect', () => console.log('disconnect'));
+
+        route.stops.forEach(function (stop) {
+            var position = stop.getPosition(),
+                marker = document.createElement('div');
+
+            marker.classList.add('bus-stop');
+            marker.innerHTML = '<span class="capt">' + stop.id + '</span>';
+            marker.setAttribute('style', 'left:' + position + '%');
+            routeView.appendChild(marker);
+        });
+
 
         if (clock !== false) {
             clock.terminate();
@@ -8600,7 +8595,14 @@ document.addEventListener("DOMContentLoaded"/*'deviceready'*/, function () {
                 $(routeView).append(me.elMustBeHere);
             }
 
-            socket.emit('message', {id: busId.value, here: message.data.position, mustBeHere: message.data.position});
+            socket.emit('message', {
+                id: busId.value,
+                here: position,
+                mustBeHere: message.data.position,
+                latitude,
+                longitude
+            });
+
             me.elMustBeHere.css('width', message.data.position + '%');
 
             if (Math.floor((route.getElapsedTime(position) - message.data.time)) < 0) {
@@ -8621,7 +8623,6 @@ document.addEventListener("DOMContentLoaded"/*'deviceready'*/, function () {
             console.log(e);
         };
 
-
         clock.postMessage([route.stops, route.getLength()]);
     };
 
@@ -8633,6 +8634,9 @@ document.addEventListener("DOMContentLoaded"/*'deviceready'*/, function () {
             pos.coords.latitude,
             pos.coords.longitude
         ]), index);
+
+        latitude = pos.coords.latitude;
+        longitude = pos.coords.longitude;
 
         if (onRoute === false) return;
 
