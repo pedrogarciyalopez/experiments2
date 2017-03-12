@@ -1,0 +1,24 @@
+{
+  "name": "ws",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "NODE_PATH=. node index.js",
+    "build": "browserify ./frontSrc/main.js > ./public/index.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "koa": "^2.1.0",
+    "koa-router": "^5.4.0",
+    "koa-static": "^3.0.0",
+    "socket.io": "^1.7.3"
+  },
+  "devDependencies": {
+    "browserify": "^14.1.0",
+    "jquery": "^3.1.1",
+    "moment": "^2.17.1"
+  }
+}
