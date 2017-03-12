@@ -4,7 +4,7 @@ var Route = require('./Route.js'),
     Point = require('./Point.js'),
     $ = require('jquery'),
 
-    routeConfig = require('./94.json'),
+    routeConfig = require('./moscow.json'),
     clock = false,
     route = new Route(routeConfig),
     index = 0;

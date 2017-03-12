@@ -2,7 +2,7 @@ var $ = require('jquery'),
     Route = require('./Route.js'),
     Point = require('./Point.js'),
 
-    routeConfig = require('./94.json'),
+    routeConfig = require('./moscow.json'),
     route = new Route(routeConfig),
     buses = {};
 
