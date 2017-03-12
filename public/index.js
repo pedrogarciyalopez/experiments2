@@ -8516,6 +8516,16 @@ document.addEventListener("DOMContentLoaded"/*'deviceready'*/, function () {
         };
 
     const socket = io('http://192.168.0.106:3000');
+
+    socket.on('off', msg => {
+        console.log('off', msg);
+        if (buses[msg.id]) {
+            buses[msg.id].el.remove();
+            buses[msg.id].elMustBeHere.remove();
+            delete buses[msg.id];
+        }
+    });
+
     socket.on('message', msg => {
         msg.buses.forEach(bus => {
             if (bus.id == busId.value) return;
