@@ -21,7 +21,8 @@ io.on('connection', socket => {
 
         if (!buses.id) {
             socket.on('disconnect', () => {
-                socket.broadcast.emit('off', {id: msg.id})
+                socket.broadcast.emit('off', {id: msg.id});
+                delete buses[msg.id]
             })
         }
 
