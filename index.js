@@ -23,6 +23,8 @@ io.on('connection', socket => {
         console.log('Message received!', msg);
         buses[msg.id] = msg;
 
-        io.emit('message', {buses: Object.keys(buses).map(key => buses[key])});
+        socket.broadcast.emit('message', {buses: Object.keys(buses).map(key => buses[key])});
     });
+
+    socket.on('disconnect', () => console.log('disconnect'))
 });
