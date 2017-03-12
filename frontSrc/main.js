@@ -2,6 +2,7 @@
 
 var Route = require('./Route.js'),
     Point = require('./Point.js'),
+    $ = require('jquery'),
 
     routeConfig = require('./94.json'),
     clock = false,
@@ -59,12 +60,10 @@ function checkOffset(el) {
 }
 
 document.addEventListener("DOMContentLoaded"/*'deviceready'*/, function () {
-    var routeView = document.querySelector('.route'),
-        mustBeHere = document.querySelector('.must-be-here'),
-        timer = document.querySelector('#timer'),
+    var //mustBeHere = document.querySelector('.must-be-here'),
         position = 0,
         me = {
-            el: document.querySelector('.bus'),
+            //el: document.querySelector('.bus'),
             position: null,
             fromStart: 0
         };
@@ -81,9 +80,9 @@ document.addEventListener("DOMContentLoaded"/*'deviceready'*/, function () {
     };*/
 
 
-    document.onclick = function () {
+    /*document.onclick = function () {
         checkOffset(me.el);
-    };
+    };*/
 
     route.stops.forEach(function (stop) {
         var position = stop.getPosition(),
@@ -110,15 +109,29 @@ document.addEventListener("DOMContentLoaded"/*'deviceready'*/, function () {
         clock = new Worker('clock.js');
 
         clock.onmessage = function (message) {
-            socket.emit('message', {id: 1, here: message.data.position, mustBeHere: message.data.position});
-            mustBeHere.setAttribute('style', 'width:' + message.data.position + '%');
-            routeView.classList.remove('lag');
-            routeView.classList.remove('lead');
-            if (Math.floor((route.getElapsedTime(position) - message.data.time)) < 0) {
-                routeView.classList.add('lag');
-            } else if (Math.floor((route.getElapsedTime(position) - message.data.time)) > 0) {
-                routeView.classList.add('lead');
+
+            if (!me.el) {
+                me.el = $('<div class="bus"></div>');
+                me.elMustBeHere = $('<div class="bus must-be-here"></div>');
+
+                $(routeView).append(me.el);
+                $(routeView).append(me.elMustBeHere);
             }
+
+            socket.emit('message', {id: busId.value, here: message.data.position, mustBeHere: message.data.position});
+            me.elMustBeHere.css('width', message.data.position + '%');
+
+            if (Math.floor((route.getElapsedTime(position) - message.data.time)) < 0) {
+                me.el.addClass('lag');
+                me.elMustBeHere.addClass('lead');
+            } else if (Math.floor((route.getElapsedTime(position) - message.data.time)) > 0) {
+                me.el.addClass('lead');
+                me.elMustBeHere.addClass('lag');
+            } else {
+                me.el.removeClass('lag lead');
+                me.elMustBeHere.removeClass('lag lead');
+            }
+
             timer.innerHTML = makeClock(Math.floor((route.getElapsedTime(position) - message.data.time)));
         };
 
@@ -144,8 +157,8 @@ document.addEventListener("DOMContentLoaded"/*'deviceready'*/, function () {
         index = onRoute.segmentIndex;
         position = onRoute.position;
 
-        me.el.setAttribute('style', 'width:' + position + '%');
-        checkOffset(me.el);
+        me.elMustBeHere.css('width', position + '%');
+        //checkOffset(me.el);
 
     }, function () {
 

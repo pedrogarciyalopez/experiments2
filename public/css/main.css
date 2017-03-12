@@ -47,7 +47,7 @@ body {
   border-right: none;
 }
 
-.route .bus-stop {
+.bus-stop {
   width: 14vh;
   height: 100%;
   position: absolute;
@@ -55,42 +55,45 @@ body {
   text-align: center;
 }
 
-.route .bus-stop .capt {
+.bus-stop .capt {
   font-family: sans-serif;
-  color: #7ab65c;
+  color: rgba(122,182,92,1);
   font-weight: bold;
   line-height: 30vh;
-  font-size: 7vh;
+  font-size: 5vh;
 }
 
-.route .bus-stop:before,
-.route .bus-stop:after {
+.bus-stop:before,
+.bus-stop:after {
   content: '';
   position: absolute;
-  height: 7vh;
-  border-left: 1px solid #7ab65c;
+  height: 10%;
+  border-left: 1px solid rgba(122,182,92,0.6);
   left: 50%;
 }
 
-.route .bus-stop:before {
-  top: 0;
-  height: 8vh;
-  margin-top: -8px;
+.bus-stop:before {
+  top: 30%;
 }
 
-.route .bus-stop:after {
-  bottom: 0;
+.bus-stop:after {
+  bottom: 31%;
 }
 
-.route .bus,
-.route .must-be-here {
-  background-color: rgba(255, 133, 43, 0.4);
+.bus,
+.another-bus {
   position: absolute;
   height: 100%;
 }
 
-.route .bus:before,
-.route .must-be-here:before {
+.bus {
+  background: linear-gradient(to bottom, rgba(255, 133, 43, 0.4), transparent);
+}
+
+.bus:before,
+.bus.must-be-here:before,
+.another-bus:before,
+.another-bus.must-be-here:before {
   content: '';
   width: 0;
   height: 0;
@@ -101,67 +104,52 @@ body {
   left: 100%;
 }
 
-.route .bus:before {
+.bus:not(.must-be-here):before,
+.another-bus:not(.must-be-here):before {
   border-top: 20px solid #ff852b;
   top: -28px;
 }
 
-.route .must-be-here:before {
+.must-be-here:before {
   border-bottom: 20px solid #ff852b;
 }
 
-.bus.lag:before,
-.route.lag .bus:before,
-.route.dispatcher .bus.must-be-here.lag:before {
-  border-right-width: 0;
+.another-bus:before {
+  border-bottom-color: #00d1eb !important;
+  border-top-color: #00d1eb !important;
 }
 
-.route.lag .must-be-here:before {
-  border-left-width: 0;
-  margin-left: 0;
+.another-bus:not(.must-be-here):before {
+  top: auto;
+  bottom: 0;
 }
 
-.bus.lead:before,
-.route.lead .bus:before,
-.route.dispatcher .bus.must-be-here.lead:before {
-  border-left-width: 0;
-  margin-left: 0;
+.another-bus.must-be-here:before {
+  top: auto;
+  bottom: -20px;
 }
 
-.route.lead .must-be-here:before {
-  border-right-width: 0;
+.lag:before {
+  border-right-width: 0 !important;
 }
 
-/*---------------------------------------------------------------*/
-
-.route.dispatcher .bus {
-  background-color: transparent;
+.lead:before {
+  border-left-width: 0 !important;
+  margin-left: 0 !important;
 }
 
-.route.dispatcher .bus > span {
+.another-bus > span {
   color: #fff;
   position: absolute;
-  top: -50px;
+  bottom: 23px;
   display: block;
   width: 50px;
   left: -25px;
   text-align: center;
+  font-family: sans-serif;
+  font-weight: bold;
 }
 
-.route.dispatcher .bus.must-be-here > span {
-  top: 25px;
+.another-bus.must-be-here > span {
+  bottom: -42px;
 }
-
-.route.dispatcher .bus.must-be-here:before {
-  content: '';
-  width: 0;
-  height: 0;
-  border-top: none;
-  border-left: 20px solid transparent;
-  border-right: 20px solid transparent;
-  position: absolute;
-  margin-left: -20px;
-  left: 100%;
-  top: 0;
-}
-

@@ -31,8 +31,8 @@ function initialize() {
     socket.on('message', msg => {
         msg.buses.forEach(bus => {
             if (!buses[bus.id]) {
-                var el = $('<div class="bus"><span>' + bus.id + '</span></div>'),
-                    elMustBeHere = $('<div class="bus must-be-here"><span>' + bus.id + '</span></div>');
+                var el = $('<div class="another-bus"><span>' + bus.id + '</span></div>'),
+                    elMustBeHere = $('<div class="another-bus must-be-here"><span>' + bus.id + '</span></div>');
 
                 buses[bus.id] = {
                     el,
