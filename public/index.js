@@ -8454,6 +8454,7 @@ var Route = require('./Route.js'),
     clock = false,
     route = new Route(routeConfig),
     index = 0,
+    buses = {},
     me = {};
 
 function makeClock(time) {
@@ -8514,7 +8515,43 @@ document.addEventListener("DOMContentLoaded"/*'deviceready'*/, function () {
             fromStart: 0
         };
 
-    const socket = io('http://192.168.0.102:3000');
+    const socket = io('http://192.168.0.106:3000');
+    socket.on('message', msg => {
+        msg.buses.forEach(bus => {
+            if (bus.id == busId.value) return;
+
+            if (!buses[bus.id]) {
+                var el = $('<div class="another-bus"><span>' + bus.id + '</span></div>'),
+                    elMustBeHere = $('<div class="another-bus must-be-here"><span>' + bus.id + '</span></div>');
+
+                buses[bus.id] = {
+                    el,
+                    elMustBeHere
+                };
+
+                $(routeView).append(el);
+                $(routeView).append(elMustBeHere);
+            }
+
+            buses[bus.id].el
+                .css('left', bus.here+'%');
+
+            buses[bus.id].elMustBeHere
+                .css('left', bus.mustBeHere+'%');
+
+            if (bus.here > bus.mustBeHere) {
+                buses[bus.id].el.removeClass('lag').addClass('lead');
+                buses[bus.id].elMustBeHere.removeClass('lead').addClass('lag');
+            } else if (bus.here < bus.mustBeHere) {
+                buses[bus.id].el.removeClass('lead').addClass('lag');
+                buses[bus.id].elMustBeHere.removeClass('lag').addClass('lead');
+            } else {
+                buses[bus.id].el.removeClass('lag lead');
+                buses[bus.id].elMustBeHere.removeClass('lag lead');
+            }
+        });
+    });
+
     socket.on('connect', function(){console.log('connect')});
     socket.on('disconnect', function(){console.log('disconnect')});
 
@@ -8555,7 +8592,6 @@ document.addEventListener("DOMContentLoaded"/*'deviceready'*/, function () {
         clock = new Worker('clock.js');
 
         clock.onmessage = function (message) {
-
             if (!me.el) {
                 me.el = $('<div class="bus"></div>');
                 me.elMustBeHere = $('<div class="bus must-be-here"></div>');
